@@ -1,0 +1,253 @@
+{% extends "products/base.html" %}
+
+{% block title %}Mon Compte - Parfumerie Anas{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="section-title">
+                <i class="fas fa-user-circle"></i> Mon Compte
+            </h1>
+            <p class="section-subtitle">Gérez vos informations personnelles</p>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2><i class="fas fa-user"></i> Informations personnelles</h2>
+                    <a href="{% url 'customers:profile_edit' %}" class="btn btn-edit">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                </div>
+                
+                <div class="profile-info">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i> Nom d'utilisateur
+                        </div>
+                        <div class="info-value">{{ user.username }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-signature"></i> Prénom
+                        </div>
+                        <div class="info-value">{{ user.first_name|default:"Non renseigné" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-signature"></i> Nom de famille
+                        </div>
+                        <div class="info-value">{{ user.last_name|default:"Non renseigné" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-envelope"></i> Email
+                        </div>
+                        <div class="info-value">{{ user.email|default:"Non renseigné" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-alt"></i> Membre depuis
+                        </div>
+                        <div class="info-value">{{ user.date_joined|date:"d F Y" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if customer %}
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2><i class="fas fa-address-card"></i> Coordonnées</h2>
+                </div>
+                
+                <div class="profile-info">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-phone"></i> Téléphone
+                        </div>
+                        <div class="info-value">{{ customer.phone|default:"Non renseigné" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-map-marker-alt"></i> Adresse
+                        </div>
+                        <div class="info-value">{{ customer.address|default:"Non renseignée" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-city"></i> Ville
+                        </div>
+                        <div class="info-value">{{ customer.city|default:"Non renseignée" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-mail-bulk"></i> Code postal
+                        </div>
+                        <div class="info-value">{{ customer.postal_code|default:"Non renseigné" }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="profile-actions">
+                <a href="{% url 'customers:password_change' %}" class="btn btn-secondary">
+                    <i class="fas fa-key"></i> Changer le mot de passe
+                </a>
+                <a href="{% url 'products:product_list' %}" class="btn">
+                    <i class="fas fa-arrow-left"></i> Retour aux produits
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .profile-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .profile-card {
+            background-color: var(--secondary-dark);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .profile-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .profile-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+            color: var(--primary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--primary-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 150px;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, #3a3a3a 100%);
+            color: var(--text-light);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #3a3a3a 0%, var(--secondary-dark) 100%);
+            color: var(--accent-gold);
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                padding: 1.5rem;
+            }
+
+            .profile-card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .info-label {
+                min-width: auto;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+{% endblock %}
+

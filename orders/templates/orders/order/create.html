@@ -1,0 +1,519 @@
+{% extends "products/base.html" %}
+
+{% block title %}Finaliser la commande - Parfumerie Anas{% endblock %}
+
+{% block content %}
+<style>
+    @import url(\'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap\');
+    
+    :root {
+        --primary-dark: #1a1a1a;
+        --secondary-dark: #2c2c2c;
+        --accent-gold: #d4af37;
+        --text-light: #e0e0e0;
+        --text-muted: #a0a0a0;
+        --border-subtle: #555;
+        --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    body {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        color: var(--text-light);
+        font-family: \'Montserrat\', sans-serif;
+        min-height: 100vh;
+    }
+    
+    .luxury-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .page-title {
+        font-family: \'Playfair Display\', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--accent-gold);
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+    
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 3rem;
+        align-items: start;
+    }
+    
+    .form-section {
+        background: var(--secondary-dark);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-card);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    
+    .section-title {
+        font-family: \'Playfair Display\', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--accent-gold);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title::before {
+        content: "✦";
+        color: var(--accent-gold);
+        font-size: 1.2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: var(--primary-dark);
+        border: 2px solid var(--border-subtle);
+        border-radius: 8px;
+        color: var(--text-light);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: \'Montserrat\', sans-serif;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        background: rgba(42, 42, 42, 0.8);
+    }
+    
+    .form-control::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .form-row-address {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+        border: none;
+        color: #000;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 1rem 2.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: var(--shadow-soft);
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(212, 175, 55, 0.3);
+        background: linear-gradient(135deg, #e6c547 0%, #d4af37 100%);
+    }
+    
+    .order-summary {
+        background: var(--secondary-dark);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-card);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .summary-title {
+        font-family: \'Playfair Display\', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--accent-gold);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        padding-bottom: 1rem;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .item-details h6 {
+        color: var(--text-light);
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+    }
+    
+    .item-meta {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .item-price {
+        color: var(--accent-gold);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .order-total {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--accent-gold);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .total-label {
+        font-family: \'Playfair Display\', serif;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+    
+    .total-amount {
+        font-family: \'Playfair Display\', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent-gold);
+    }
+    
+    .security-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .security-badge::before {
+        content: "🔒";
+    }
+    
+    @media (max-width: 768px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .luxury-container {
+            padding: 1rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .form-section,
+        .order-summary {
+            padding: 1.5rem;
+        }
+        
+        .form-row,
+        .form-row-address {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Animation d\'entrée */
+    .form-section,
+    .order-summary {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Styles pour les options de paiement */
+    .payment-method-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .payment-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .payment-option {
+        position: relative;
+    }
+    
+    .payment-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .payment-label {
+        cursor: pointer;
+        display: block;
+    }
+    
+    .payment-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: var(--primary-dark);
+        border: 2px solid var(--border-subtle);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-option input[type="radio"]:checked + .payment-label .payment-card {
+        border-color: var(--accent-gold);
+        background: rgba(212, 175, 55, 0.1);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .payment-card:hover {
+        border-color: var(--accent-gold);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .payment-icon {
+        font-size: 2rem;
+        color: var(--accent-gold);
+        min-width: 3rem;
+        text-align: center;
+    }
+    
+    .payment-info h4 {
+        color: var(--text-light);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+    }
+    
+    .payment-info p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+</style>
+
+<div class="luxury-container">
+    <div class="page-header">
+        <h1 class="page-title">Finaliser votre commande</h1>
+        <p class="page-subtitle">Quelques informations pour livrer vos parfums d\'exception</p>
+    </div>
+    
+    <div class="checkout-grid">
+        <div class="form-section">
+            <h2 class="section-title">Informations de livraison</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                    {{ form.address }}
+                </div>
+                
+                <div class="form-row-address">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
+                        {{ form.postal_code }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                        {{ form.city }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                </div>
+                
+                <div class="form-group payment-method-section">
+                    <label class="form-label">{{ form.payment_method.label }}</label>
+                    <div class="payment-options">
+                            <div class="payment-option">
+                                <input type="radio" id="id_payment_method_0" name="payment_method" value="online" checked>
+                                <label for="id_payment_method_0" class="payment-label">
+                                    <div class="payment-card">
+                                        <i class="fas fa-credit-card payment-icon"></i>
+                                        <div class="payment-info">
+                                            <h4>Paiement en ligne</h4>
+                                            <p>Payez par carte bancaire en toute sécurité</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-option">
+                                <input type="radio" id="id_payment_method_1" name="payment_method" value="cash_on_delivery">
+                                <label for="id_payment_method_1" class="payment-label">
+                                    <div class="payment-card">
+                                        <i class="fas fa-truck payment-icon"></i>
+                                        <div class="payment-info">
+                                            <h4>À la livraison</h4>
+                                            <p>Payez en espèces lors de la réception</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    Procéder au paiement sécurisé
+                </button>
+                
+                <div class="security-badge">
+                    Vos informations sont protégées par un cryptage SSL
+                </div>
+            </form>
+        </div>
+        
+        <div class="order-summary">
+            <h3 class="summary-title">Récapitulatif de votre commande</h3>
+            
+            {% for item in cart %}
+                <div class="order-item">
+                    <div class="item-details">
+                        <h6>{{ item.product.name }}</h6>
+                        <div class="item-meta">{{ item.quantity }} × {{ item.price }} DH</div>
+                    </div>
+                    <div class="item-price">{{ item.total_price }} DH</div>
+                </div>
+            {% endfor %}
+            
+            <div class="order-total">
+                <span class="total-label">Total</span>
+                <span class="total-amount">{{ cart.get_total_price }} DH</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener(\'DOMContentLoaded\', function() {
+    // Animation des champs au focus
+    const inputs = document.querySelectorAll(".form-control");
+    inputs.forEach(input => {
+        input.addEventListener(\'focus\', function() {
+            this.parentElement.style.transform = \'scale(1.02)\';
+            this.parentElement.style.transition = \'transform 0.2s ease\';
+        });
+        
+        input.addEventListener(\'blur\', function() {
+            this.parentElement.style.transform = \'scale(1)\';
+        });
+    });
+    
+    // Validation en temps réel
+    const form = document.querySelector(\'form\');
+    const submitBtn = document.querySelector(".btn-primary");
+    
+    function validateForm() {
+        const requiredFields = form.querySelectorAll(\'input[required], select[required]\');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+            }
+        });
+        
+        if (isValid) {
+            submitBtn.removeAttribute(\'disabled\');
+            submitBtn.style.opacity = \'1\';
+            submitBtn.style.cursor = \'pointer\';
+        } else {
+            submitBtn.setAttribute(\'disabled\', \'true\');
+            submitBtn.style.opacity = \'0.6\';
+            submitBtn.style.cursor = \'not-allowed\';
+        }
+    }
+    
+    form.addEventListener(\'input\', validateForm);
+    validateForm(); // Appel initial pour définir l\'état du bouton au chargement de la page
+});
+</script>
+{% endblock %}
+
+

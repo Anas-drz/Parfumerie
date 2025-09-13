@@ -1,0 +1,149 @@
+{% extends "products/base.html" %}
+
+{% block title %}Paiement annulé - Parfumerie Anas{% endblock %}
+
+{% block content %}
+<style>
+    .cancelled-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        text-align: center;
+        padding: 3rem;
+        background-color: var(--secondary-dark);
+        border-radius: 16px;
+        box-shadow: var(--shadow-card);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .cancelled-icon {
+        font-size: 5rem;
+        color: #ffc107;
+        margin-bottom: 2rem;
+        animation: cancelledShake 1s ease-in-out;
+    }
+
+    @keyframes cancelledShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .cancelled-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: #ffc107;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .cancelled-message {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .cancelled-details {
+        background-color: var(--primary-dark);
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .cancelled-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary-cancelled {
+        background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+        color: var(--primary-dark);
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-cancelled:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-secondary-cancelled {
+        background-color: var(--secondary-dark);
+        color: var(--text-light);
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-subtle);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-secondary-cancelled:hover {
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        border-color: var(--accent-gold);
+    }
+
+    @media (max-width: 768px) {
+        .cancelled-container {
+            margin: 1rem;
+            padding: 2rem;
+        }
+
+        .cancelled-title {
+            font-size: 2rem;
+        }
+
+        .cancelled-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="cancelled-container">
+    <div class="cancelled-icon">
+        <i class="fas fa-times-circle"></i>
+    </div>
+    
+    <h1 class="cancelled-title">Paiement annulé</h1>
+    
+    <p class="cancelled-message">
+        Votre paiement a été annulé. Aucun montant n'a été débité de votre compte.
+        Vous pouvez réessayer le paiement ou continuer vos achats.
+    </p>
+    
+    <div class="cancelled-details">
+        <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">
+            <i class="fas fa-info-circle"></i> Que faire maintenant ?
+        </h3>
+        <ul style="text-align: left; color: var(--text-light); line-height: 1.8;">
+            <li>🔄 Réessayez le paiement avec PayPal</li>
+            <li>🛒 Vos articles sont toujours dans votre panier</li>
+            <li>💳 Vérifiez vos informations de paiement</li>
+            <li>📞 Contactez-nous si vous rencontrez des difficultés</li>
+        </ul>
+    </div>
+    
+    <div class="cancelled-actions">
+        <a href="{% url 'cart:cart_detail' %}" class="btn-primary-cancelled">
+            <i class="fas fa-shopping-cart"></i> Retour au panier
+        </a>
+        <a href="{% url 'products:product_list' %}" class="btn-secondary-cancelled">
+            <i class="fas fa-shopping-bag"></i> Continuer mes achats
+        </a>
+    </div>
+</div>
+{% endblock %}
+

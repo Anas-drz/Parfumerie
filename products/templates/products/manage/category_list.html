@@ -1,0 +1,63 @@
+{% extends "products/manage/base_manage.html" %}
+
+{% block title %}Gestion des Catégories - Parfumerie Anas{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1 class="page-title">Gestion des Catégories</h1>
+        <a href="{% url 'products:category_create' %}" class="btn">Nouvelle Catégorie</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Liste des Catégories ({{ categories.count }} catégorie{{ categories.count|pluralize }})
+        </div>
+        <div class="card-body">
+            {% if categories %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Slug</th>
+                                <th>Nombre de produits</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in categories %}
+                                <tr>
+                                    <td><strong>{{ category.name }}</strong></td>
+                                    <td><code>{{ category.slug }}</code></td>
+                                    <td>
+                                        <span class="badge badge-success">{{ category.products.count }} produit{{ category.products.count|pluralize }}</span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                            <a href="{{ category.get_absolute_url }}" 
+                                               class="btn btn-sm btn-secondary" target="_blank">Voir sur le site</a>
+                                            <a href="{% url 'products:category_update' category.id %}" 
+                                               class="btn btn-sm">Modifier</a>
+                                            <a href="{% url 'products:category_delete' category.id %}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirmDelete('Êtes-vous sûr de vouloir supprimer cette catégorie ? Tous les produits associés seront également supprimés.')">
+                                                Supprimer
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem;">
+                    <h3>Aucune catégorie trouvée</h3>
+                    <p>Créez votre première catégorie pour organiser vos produits.</p>
+                    <a href="{% url 'products:category_create' %}" class="btn">Créer la première catégorie</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

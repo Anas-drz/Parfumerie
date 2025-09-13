@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Parfumerie Anas{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap");
+
+        :root {
+            --primary-dark: #1a1a1a;
+            --secondary-dark: #2c2c2c;
+            --accent-gold: #d4af37;
+            --text-light: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-subtle: #555;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --success-green: #28a745;
+            --error-red: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--primary-dark);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-links a,
+        .nav-links span {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links span:hover {
+            color: var(--accent-gold);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cart-link {
+            background-color: var(--secondary-dark);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .cart-link:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+        }
+
+        .container {
+            flex-grow: 1;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-link {
+            background-color: var(--secondary-dark);
+            color: var(--text-light);
+            padding: 0.7rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-weight: 500;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .category-link:hover,
+        .category-link.active {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            border-color: var(--accent-gold);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: var(--secondary-dark);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .product-image-container {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .product-name:hover {
+            color: var(--accent-gold);
+        }
+
+        .product-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+            border: none;
+            color: var(--primary-dark);
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            background: linear-gradient(135deg, #e6c547 0%, var(--accent-gold) 100%);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .section-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .quantity-form {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quantity-form select {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            border: 1px solid var(--border-subtle);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.2c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095.1c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7em top 50%, 0 0;
+            background-size: 0.65em auto, 100%;
+        }
+
+        .quantity-form label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .messages {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .messages .alert-success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .messages .alert-error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+        }
+
+        .messages .alert-info {
+            background-color: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .footer {
+            background-color: var(--primary-dark);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-subtle);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .logo {
+                font-size: 1.8rem;
+            }
+
+            .search-container {
+                order: 2;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .nav-links {
+                order: 3;
+            }
+
+            .container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .section-subtitle {
+                font-size: 1rem;
+            }
+
+            .product-image-container {
+                height: 200px;
+            }
+
+            .alphabet-search {
+                gap: 0.25rem;
+            }
+
+            .alphabet-letter {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) and (max-width: 1400px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Styles pour la barre de recherche intelligente */
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            z-index: 2;
+        }
+
+        #smart-search {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            background-color: var(--secondary-dark);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        #smart-search:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            background-color: var(--primary-dark);
+        }
+
+        #smart-search::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-dark);
+            border: 2px solid var(--border-subtle);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .search-result-item:hover {
+            background-color: var(--primary-dark);
+            color: var(--accent-gold);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: inherit;
+        }
+
+        .search-result-category {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .search-result-price {
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+        }
+
+        .search-no-results {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .search-loading {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .search-loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alphabet de recherche rapide */
+        /*
+        .alphabet-search {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .alphabet-letter {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-dark);
+            color: var(--text-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .alphabet-letter:hover,
+        .alphabet-letter.active {
+            background-color: var(--accent-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        */
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="{% url 'products:product_list' %}" class="logo">Parfumerie Anas</a>
+            
+            <!-- Barre de recherche intelligente -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="smart-search" placeholder="Rechercher un parfum..." autocomplete="off">
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
+            
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <span style="color: var(--accent-gold);">Bonjour, {{ user.first_name|default:user.username }}</span>
+                    <a href="{% url 'customers:profile' %}"><i class="fas fa-user-circle"></i> Mon Profil</a>
+                    <a href="{% url 'customers:logout' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                {% else %}
+                    <a href="{% url 'customers:login' %}"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
+                    <a href="{% url 'customers:register' %}" style="color: var(--accent-gold);"><i class="fas fa-user-plus"></i> S'inscrire</a>
+                {% endif %}
+                <a href="{% url 'cart:cart_detail' %}" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i> Mon panier ({{ cart|length }} article{{ cart|length|pluralize }})
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Parfumerie Anas. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Fonctionnalité de recherche intelligente
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('smart-search');
+            const searchResults = document.getElementById('search-results');
+            let searchTimeout;
+
+            // Fonction pour effectuer la recherche
+            function performSearch(query) {
+                if (query.length === 0) {
+                    hideResults();
+                    return;
+                }
+
+                showLoading();
+
+                fetch(`/api/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayResults(data.products);
+                    })
+                    .catch(error => {
+                        console.error('Erreur de recherche:', error);
+                        hideResults();
+                    });
+            }
+
+            // Fonction pour afficher les résultats
+            function displayResults(products) {
+                if (products.length === 0) {
+                    searchResults.innerHTML = '<div class="search-no-results">Aucun produit trouvé</div>';
+                } else {
+                    let html = '';
+                    products.forEach(product => {
+                        const imageUrl = product.image_url || '/static/images/no-image.png';
+                        html += `
+                            <a href="${product.url}" class="search-result-item">
+                                <img src="${imageUrl}" alt="${product.name}" class="search-result-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="search-result-info">
+                                    <div class="search-result-name">${product.name}</div>
+                                    <div class="search-result-category">${product.category}</div>
+                                    <div class="search-result-price">${product.price}  DH</div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    searchResults.innerHTML = html;
+                }
+                showResults();
+            }
+
+            // Fonction pour afficher le chargement
+            function showLoading() {
+                searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner"></i> Recherche en cours...</div>';
+                showResults();
+            }
+
+            // Fonction pour afficher les résultats
+            function showResults() {
+                searchResults.classList.add('show');
+            }
+
+            // Fonction pour masquer les résultats
+            function hideResults() {
+                searchResults.classList.remove('show');
+            }
+
+            // Événement de saisie dans le champ de recherche
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                // Annuler la recherche précédente
+                clearTimeout(searchTimeout);
+                
+                // Démarrer une nouvelle recherche avec un délai
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            // Événement de focus sur le champ de recherche
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length > 0) {
+                    performSearch(this.value.trim());
+                }
+            });
+
+            // Masquer les résultats quand on clique ailleurs
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.search-container')) {
+                    hideResults();
+                }
+            });
+
+            // Gestion des touches du clavier
+            searchInput.addEventListener('keydown', function(event) {
+                const items = searchResults.querySelectorAll('.search-result-item');
+                let currentIndex = -1;
+                
+                // Trouver l'élément actuellement sélectionné
+                items.forEach((item, index) => {
+                    if (item.classList.contains('selected')) {
+                        currentIndex = index;
+                    }
+                });
+
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    currentIndex = Math.min(currentIndex + 1, items.length - 1);
+                    updateSelection(items, currentIndex);
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    currentIndex = Math.max(currentIndex - 1, -1);
+                    updateSelection(items, currentIndex);
+                } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (currentIndex >= 0 && items[currentIndex]) {
+                        items[currentIndex].click();
+                    }
+                } else if (event.key === 'Escape') {
+                    hideResults();
+                    this.blur();
+                }
+            });
+
+            // Fonction pour mettre à jour la sélection
+            function updateSelection(items, selectedIndex) {
+                items.forEach((item, index) => {
+                    if (index === selectedIndex) {
+                        item.classList.add('selected');
+                        item.style.backgroundColor = 'var(--primary-dark)';
+                        item.style.color = 'var(--accent-gold)';
+                    } else {
+                        item.classList.remove('selected');
+                        item.style.backgroundColor = '';
+                        item.style.color = '';
+                    }
+                });
+            }
+        });
+
+        // Fonction pour la recherche par alphabet
+        function searchByLetter(letter) {
+            const searchInput = document.getElementById('smart-search');
+            searchInput.value = letter;
+            searchInput.focus();
+            
+            // Déclencher la recherche
+            const event = new Event('input', { bubbles: true });
+            searchInput.dispatchEvent(event);
+            
+            // Mettre à jour l'état actif des lettres
+            document.querySelectorAll('.alphabet-letter').forEach(el => {
+                el.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
+    <script src="{% static 'js/notifications.js' %}"></script>
+</body>
+</html>

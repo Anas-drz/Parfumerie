@@ -1,0 +1,143 @@
+{% extends "products/manage/base_manage.html" %}
+
+{% block title %}Gestion des Produits - Parfumerie Anas{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1 class="page-title">Gestion des Produits</h1>
+        <a href="{% url 'products:product_create' %}" class="btn">Nouveau Produit</a>
+    </div>
+
+    <!-- Formulaire de recherche -->
+    <div class="search-form">
+        <form method="get">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ search_form.query.id_for_label }}" class="form-label">{{ search_form.query.label }}</label>
+                    {{ search_form.query }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ search_form.category.id_for_label }}" class="form-label">{{ search_form.category.label }}</label>
+                    {{ search_form.category }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ search_form.sort_by.id_for_label }}" class="form-label">{{ search_form.sort_by.label }}</label>
+                    {{ search_form.sort_by }}
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ search_form.available_only }}
+                        <label for="{{ search_form.available_only.id_for_label }}" class="form-label">{{ search_form.available_only.label }}</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn">Rechercher</button>
+                    <a href="{% url 'products:product_manage_list' %}" class="btn btn-secondary">Réinitialiser</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Liste des Produits ({{ page_obj.paginator.count }} produit{{ page_obj.paginator.count|pluralize }})
+        </div>
+        <div class="card-body">
+            {% if products %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Catégorie</th>
+                                <th>Prix</th>
+                                <th>Disponible</th>
+                                <th>Créé</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr>
+                                    <td>
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                            <div style="width: 50px; height: 50px; background-color: #e9ecef; 
+                                                       border-radius: 4px; display: flex; align-items: center; 
+                                                       justify-content: center; font-size: 0.8rem;">
+                                                Pas d'image
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ product.name }}</strong><br>
+                                        <small class="text-muted">{{ product.slug }}</small>
+                                    </td>
+                                    <td>{{ product.category.name }}</td>
+                                    <td><strong>{{ product.price }} DH</strong></td>
+                                    <td>
+                                        {% if product.available %}
+                                            <span class="badge badge-success">Disponible</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Indisponible</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ product.created|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                            <a href="{% url 'products:product_manage_detail' product.id %}" 
+                                               class="btn btn-sm btn-secondary">Voir</a>
+                                            <a href="{% url 'products:product_update' product.id %}" 
+                                               class="btn btn-sm">Modifier</a>
+                                            <button onclick="toggleAvailability({{ product.id }})" 
+                                                    class="btn btn-sm {% if product.available %}btn-secondary{% else %}btn-success{% endif %}">
+                                                {% if product.available %}Désactiver{% else %}Activer{% endif %}
+                                            </button>
+                                            <a href="{% url 'products:product_delete' product.id %}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirmDelete('Êtes-vous sûr de vouloir supprimer ce produit ?')">
+                                                Supprimer
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.available_only %}&available_only={{ request.GET.available_only }}{% endif %}">&laquo; Première</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.available_only %}&available_only={{ request.GET.available_only }}{% endif %}">&lsaquo; Précédente</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.available_only %}&available_only={{ request.GET.available_only }}{% endif %}">Suivante &rsaquo;</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.query %}&query={{ request.GET.query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by }}{% endif %}{% if request.GET.available_only %}&available_only={{ request.GET.available_only }}{% endif %}">Dernière &raquo;</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 3rem;">
+                    <h3>Aucun produit trouvé</h3>
+                    <p>Aucun produit ne correspond à vos critères de recherche.</p>
+                    <a href="{% url 'products:product_create' %}" class="btn">Créer le premier produit</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Token CSRF pour les requêtes AJAX -->
+    {% csrf_token %}
+{% endblock %}
+

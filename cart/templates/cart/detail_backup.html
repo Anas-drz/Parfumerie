@@ -1,0 +1,467 @@
+{% extends "products/base.html" %}
+
+{% block title %}Panier d'achat - Parfumerie Anas{% endblock %}
+
+{% block content %}
+    <h1 class="section-title">Panier d'achat</h1>
+    
+
+    
+    {% if cart %}
+        <div style="background-color: #111; border-radius: 10px; padding: 2rem; margin-bottom: 2rem;">
+            <div class="cart-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">
+                <h2 style="color: #d4af37; margin: 0;">Vos articles ({{ cart|length }} article{{ cart|length|pluralize }})</h2>
+                <form action="{% url 'cart:cart_clear' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-clear" 
+                            style="background-color: #ff6b6b; color: #fff; border: none; padding: 0.5rem 1rem; 
+                                   border-radius: 3px; cursor: pointer; font-size: 0.9rem;"
+                            onclick="return confirm('Êtes-vous sûr de vouloir vider complètement le panier ?')">
+                        Vider le panier
+                    </button>
+                </form>
+            </div>
+
+            {% for item in cart %}
+                <div class="cart-item" data-product-id="{{ item.product.id }}" 
+                     style="display: flex; justify-content: space-between; align-items: center; 
+                           border-bottom: 1px solid #333; padding: 1.5rem 0;">
+                    <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                 style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        {% else %}
+                            <div style="width: 100px; height: 100px; background-color: #333; 
+                                       border-radius: 8px; display: flex; align-items: center; 
+                                       justify-content: center; font-size: 0.8rem; text-align: center;">
+                                {{ item.product.name }}
+                            </div>
+                        {% endif %}
+                        
+                        <div style="flex: 1;">
+                            <h3 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.2rem;">
+                                <a href="{{ item.product.get_absolute_url }}" style="color: #fff; text-decoration: none;">
+                                    {{ item.product.name }}
+                                </a>
+                            </h3>
+                            <p style="color: #ccc; margin-bottom: 0.5rem;">Prix unitaire: {{ item.price }} DH</p>
+                            
+                            <!-- Contrôles de quantité améliorés -->
+                            <div class="quantity-controls" style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                                <label for="quantity_{{ item.product.id }}" style="color: #ccc; font-weight: bold;">Quantité:</label>
+                                
+                                <div class="quantity-selector" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <button type="button" class="quantity-btn" data-action="decrease" data-product-id="{{ item.product.id }}"
+                                            style="background-color: #333; color: #fff; border: none; width: 30px; height: 30px; 
+                                                   border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                        -
+                                    </button>
+                                    
+                                    <input type="number" name="quantity" id="quantity_{{ item.product.id }}" 
+                                           value="{{ item.quantity }}" min="1" max="20"
+                                           class="quantity-input" data-product-id="{{ item.product.id }}"
+                                           style="background-color: #333; color: #fff; border: 1px solid #555; 
+                                                  padding: 0.5rem; border-radius: 3px; width: 60px; text-align: center;">
+                                    
+                                    <button type="button" class="quantity-btn" data-action="increase" data-product-id="{{ item.product.id }}"
+                                            style="background-color: #333; color: #fff; border: none; width: 30px; height: 30px; 
+                                                   border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                        +
+                                    </button>
+                                </div>
+                                
+                                <div class="quantity-status" id="status_{{ item.product.id }}" style="color: var(--text-muted); font-size: 0.9rem;">
+                                    <!-- Statut de mise à jour -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: right; min-width: 150px;">
+                        <div class="item-total" style="color: #d4af37; font-weight: bold; margin-bottom: 1rem; font-size: 1.3rem;">
+                            {{ item.total_price }} DH
+                        </div>
+                        <form action="{% url 'cart:cart_remove' item.product.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-btn"
+                                    style="background-color: #ff6b6b; color: #fff; border: none; padding: 0.5rem 1rem; 
+                                           border-radius: 3px; cursor: pointer; font-size: 0.9rem;"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="cart-summary" style="margin-top: 2rem; text-align: center; border-top: 1px solid #333; padding-top: 2rem;">
+                <div class="total-price" style="font-size: 1.8rem; color: #d4af37; font-weight: bold; margin-bottom: 2rem;">
+                    Total: <span id="cart-total">{{ cart.get_total_price }}</span> DH
+                </div>
+                
+                <div class="cart-actions" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'orders:order_create' %}" class="btn checkout-btn" 
+                       style="font-size: 1.2rem; padding: 1rem 2rem; background-color: #28a745; color: #fff;">
+                        Finaliser la commande
+                    </a>
+                    <a href="{% url 'products:product_list' %}" class="btn continue-shopping-btn" 
+                       style="background-color: #333; color: #fff; font-size: 1.2rem; padding: 1rem 2rem;">
+                        Continuer les achats
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart" style="text-align: center; padding: 4rem; background-color: #111; border-radius: 10px;">
+            <div style="font-size: 4rem; color: #333; margin-bottom: 1rem;">🛒</div>
+            <h2 style="color: #ccc; margin-bottom: 1rem;">Votre panier est vide</h2>
+            <p style="color: #999; margin-bottom: 2rem;">Découvrez nos parfums authentiques et ajoutez vos favoris au panier.</p>
+            <a href="{% url 'products:product_list' %}" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
+                Découvrir nos produits
+            </a>
+        </div>
+    {% endif %}
+
+    <script>
+
+
+        // Fonction pour mettre à jour la quantité automatiquement
+        function updateQuantityAuto(productId, newQuantity) {
+            const statusElement = document.getElementById(`status_${productId}`);
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
+            statusElement.style.color = 'var(--accent-gold)';
+
+            // Créer et soumettre le formulaire
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/update/${productId}/`;
+            
+            // Ajouter le token CSRF
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Ajouter la quantité
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = newQuantity;
+            form.appendChild(quantityInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Gestion des événements au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des boutons de quantité avec mise à jour automatique
+            document.querySelectorAll('.quantity-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    const productId = this.dataset.productId;
+                    const input = document.getElementById('quantity_' + productId);
+                    let currentValue = parseInt(input.value);
+                    let newValue = currentValue;
+                    
+                    if (action === 'increase' && currentValue < 20) {
+                        newValue = currentValue + 1;
+                        input.value = newValue;
+                    } else if (action === 'decrease' && currentValue > 1) {
+                        newValue = currentValue - 1;
+                        input.value = newValue;
+                    }
+                    
+                    // Mise à jour automatique si la valeur a changé
+                    if (newValue !== currentValue) {
+                        setTimeout(() => {
+                            updateQuantityAuto(productId, newValue);
+                        }, 500); // Délai de 500ms pour éviter les clics multiples
+                    }
+                });
+            });
+            
+            // Mise à jour automatique lors de la saisie directe
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                let timeoutId;
+                
+                input.addEventListener('input', function() {
+                    const productId = this.dataset.productId;
+                    let value = parseInt(this.value);
+                    
+                    // Validation
+                    if (value < 1) {
+                        this.value = 1;
+                        value = 1;
+                    }
+                    if (value > 20) {
+                        this.value = 20;
+                        value = 20;
+                    }
+                    
+                    // Annuler le timeout précédent
+                    clearTimeout(timeoutId);
+                    
+                    // Afficher le statut de saisie
+                    const statusElement = document.getElementById(`status_${productId}`);
+                    statusElement.innerHTML = '<i class="fas fa-edit"></i> Saisie en cours...';
+                    statusElement.style.color = 'var(--text-muted)';
+                    
+                    // Programmer la mise à jour après 1 seconde d'inactivité
+                    timeoutId = setTimeout(() => {
+                        updateQuantityAuto(productId, value);
+                    }, 1000);
+                });
+                
+                // Mise à jour immédiate lors de la perte de focus
+                input.addEventListener('blur', function() {
+                    const productId = this.dataset.productId;
+                    let value = parseInt(this.value);
+                    
+                    // Validation
+                    if (value < 1) {
+                        this.value = 1;
+                        value = 1;
+                    }
+                    if (value > 20) {
+                        this.value = 20;
+                        value = 20;
+                    }
+                    
+                    // Annuler le timeout et mettre à jour immédiatement
+                    clearTimeout(timeoutId);
+                    updateQuantityAuto(productId, value);
+                });
+            });
+            
+            // Gestion des formulaires de suppression
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+                        const form = this.closest('form');
+                        form.submit();
+                    }
+                });
+            });
+            
+            // Gestion du bouton vider le panier
+            document.querySelector('.btn-clear')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Êtes-vous sûr de vouloir vider complètement le panier ?')) {
+                    const form = this.closest('form');
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Styles pour les toasts animés */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--secondary-dark);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transform: translateX(100%);
+            opacity: 0;
+            animation: slideIn 0.4s ease-out forwards;
+            position: relative;
+        }
+
+        .toast.toast-success {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .toast.toast-error {
+            border-left: 4px solid var(--error-red);
+        }
+
+        .toast.toast-info {
+            border-left: 4px solid #007bff;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--success-green);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--error-red);
+        }
+
+        .toast-info .toast-icon {
+            color: #007bff;
+        }
+
+        .toast-message {
+            flex: 1;
+            color: var(--text-light);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .toast-progress {
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), #b8941f);
+            transform-origin: left;
+            animation: progressBar 4s linear forwards;
+        }
+
+        .toast.closing {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes progressBar {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .toast {
+                transform: translateY(-100%);
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                from {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+            }
+        }
+
+        .quantity-btn:hover {
+            background-color: #555 !important;
+        }
+        
+        .remove-btn:hover {
+            background-color: #c82333 !important;
+        }
+        
+        .btn-clear:hover {
+            background-color: #c82333 !important;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #218838 !important;
+        }
+        
+        .continue-shopping-btn:hover {
+            background-color: #555 !important;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .quantity-status {
+            min-width: 120px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .cart-actions {
+                flex-direction: column;
+            }
+            
+            .quantity-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+{% endblock %}
+

@@ -1,0 +1,285 @@
+/* Système de notifications modernes - Design luxueux et intelligent */
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+    pointer-events: none;
+}
+
+.notification {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: 16px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    transform: translateX(100%) scale(0.95);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    pointer-events: auto;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.notification.show {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+}
+
+.notification.hide {
+    transform: translateX(100%) scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease-in;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    gap: 16px;
+    position: relative;
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.notification-success .notification-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.notification-error .notification-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.notification-warning .notification-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.notification-info .notification-icon {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.notification-message {
+    flex: 1;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
+}
+
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #d4af37, #b8941f);
+    border-radius: 0 0 16px 16px;
+    animation: progress-bar linear forwards;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+@keyframes progress-bar {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Variantes de couleur pour les bordures */
+.notification-success {
+    border-left: 4px solid #10b981;
+}
+
+.notification-error {
+    border-left: 4px solid #ef4444;
+}
+
+.notification-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.notification-info {
+    border-left: 4px solid #3b82f6;
+}
+
+/* Animations d'entrée spéciales */
+.notification:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.notification:nth-child(2) {
+    animation-delay: 100ms;
+}
+
+.notification:nth-child(3) {
+    animation-delay: 200ms;
+}
+
+.notification:nth-child(4) {
+    animation-delay: 300ms;
+}
+
+/* Effet de hover sur toute la notification */
+.notification:hover {
+    transform: translateX(-5px) scale(1.02);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 12px 24px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.notification:hover .notification-progress {
+    animation-play-state: paused;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .notification {
+        border-radius: 12px;
+    }
+    
+    .notification-content {
+        padding: 16px;
+        gap: 12px;
+    }
+    
+    .notification-message {
+        font-size: 14px;
+    }
+}
+
+/* Animation de pulsation pour les notifications importantes */
+.notification-error,
+.notification-warning {
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-left-width: 4px;
+    }
+    50% {
+        border-left-width: 6px;
+    }
+}
+
+/* Effet de brillance subtile */
+.notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.notification:hover::before {
+    left: 100%;
+}
+
+/* Masquer les messages Django par défaut */
+.messages,
+.alert {
+    display: none !important;
+}
+
+/* Style pour les notifications de panier spécifiques */
+.notification.cart-notification .notification-icon {
+    background: linear-gradient(135deg, #d4af37, #b8941f);
+    color: white;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.notification.cart-notification {
+    border-left: 4px solid #d4af37;
+}
+
+/* Animation spéciale pour les notifications de succès */
+.notification-success .notification-icon {
+    animation: success-bounce 0.6s ease-out;
+}
+
+@keyframes success-bounce {
+    0% {
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Style pour les notifications persistantes */
+.notification.persistent {
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.notification.persistent .notification-progress {
+    display: none;
+}
+

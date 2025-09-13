@@ -1,0 +1,275 @@
+{% extends "products/base.html" %}
+
+{% block title %}{{ product.name }} - Parfumerie Anas{% endblock %}
+
+{% block content %}
+<style>
+    .product-detail-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+        margin-bottom: 3rem;
+    }
+
+    .product-image-detail {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-card);
+        transition: transform 0.3s ease;
+    }
+
+    .product-image-detail:hover {
+        transform: scale(1.02);
+    }
+
+    .product-image-placeholder {
+        width: 100%;
+        max-width: 500px;
+        height: 500px;
+        background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--primary-dark) 100%);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        text-align: center;
+        padding: 2rem;
+        box-shadow: var(--shadow-card);
+    }
+
+    .product-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent-gold);
+        font-weight: 700;
+        line-height: 1.2;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .product-description {
+        margin-bottom: 2.5rem;
+        line-height: 1.8;
+        color: var(--text-light);
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
+    .product-price-detail {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: var(--accent-gold);
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .quantity-form-detail {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: var(--secondary-dark);
+        border-radius: 12px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .quantity-form-detail label {
+        color: var(--text-light);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .quantity-form-detail select {
+        background-color: var(--primary-dark);
+        color: var(--text-light);
+        border: 2px solid var(--border-subtle);
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        min-width: 80px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d4af37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.2c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095.1c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+        background-repeat: no-repeat;
+        background-position: right 0.7em top 50%, 0 0;
+        background-size: 0.65em auto, 100%;
+        transition: border-color 0.3s ease;
+    }
+
+    .quantity-form-detail select:focus {
+        outline: none;
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+    .add-to-cart-btn {
+        background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+        border: none;
+        color: var(--primary-dark);
+        padding: 1rem 2.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .add-to-cart-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        background: linear-gradient(135deg, #e6c547 0%, var(--accent-gold) 100%);
+    }
+
+    .unavailable-message {
+        color: var(--error-red);
+        font-size: 1.3rem;
+        font-weight: 600;
+        padding: 1.5rem;
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid var(--error-red);
+        border-radius: 8px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .back-btn {
+        background-color: var(--secondary-dark);
+        color: var(--text-light);
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-subtle);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+        background-color: var(--accent-gold);
+        color: var(--primary-dark);
+        border-color: var(--accent-gold);
+        transform: translateY(-2px);
+    }
+
+    .product-actions {
+        margin-top: 2.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .product-detail-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .product-title {
+            font-size: 2.2rem;
+        }
+
+        .product-price-detail {
+            font-size: 2rem;
+        }
+
+        .quantity-form-detail {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="product-detail-container">
+    <div>
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image-detail">
+        {% else %}
+            <div class="product-image-placeholder">
+                <i class="fas fa-spray-can" style="font-size: 4rem; margin-bottom: 1rem; color: var(--accent-gold);"></i>
+                <span>{{ product.name }}</span>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        <h1 class="product-title">{{ product.name }}</h1>
+        
+        {% if product.description %}
+            <p class="product-description">{{ product.description }}</p>
+        {% endif %}
+        
+        <div class="product-price-detail">
+            {% if product.has_discount %}
+                <div class="price-group">
+                    <div class="original-price-detail" style="font-size: 1.5rem; text-decoration: line-through; color: var(--text-muted); margin-bottom: 0.5rem;">{{ product.original_price }} DH</div>
+                    <div class="current-price-detail" style="font-size: 2.5rem; font-weight: 700; color: var(--accent-gold);">{{ product.price }} DH</div>
+                    <div class="discount-badge-detail" style="font-size: 1.2rem; color: #dc3545; font-weight: 600; margin-top: 0.5rem;">-{{ product.discount_percentage }}%</div>
+                </div>
+            {% else %}
+                {{ product.price }} DH
+            {% endif %}
+        </div>
+        
+        {% if product.available %}
+            {% if product.is_in_stock %}
+                <form action="{% url 'cart:cart_add' product.id %}" method="post" class="quantity-form-detail">
+                    {% csrf_token %}
+                    <label for="quantity"><i class="fas fa-sort-numeric-up"></i> Quantité :</label>
+                    <select name="quantity" id="quantity">
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                        {% endfor %}
+                        {% for i in "1234567890"|make_list %}
+                            {% if forloop.counter0|add:9 <= 20 %}
+                                <option value="{{ forloop.counter0|add:10 }}">{{ forloop.counter0|add:10 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="add-to-cart-btn">
+                        <i class="fas fa-shopping-cart"></i> Ajouter au panier
+                    </button>
+                </form>
+            {% else %}
+                <div class="unavailable-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Produit épuisé - Stock non disponible
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="unavailable-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                Produit actuellement indisponible
+            </div>
+        {% endif %}
+        
+        <div class="product-actions">
+            <a href="{% url 'products:product_list' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Retour aux produits
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
